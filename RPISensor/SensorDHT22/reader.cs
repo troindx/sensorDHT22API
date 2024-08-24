@@ -16,6 +16,7 @@ namespace Dht22Reader {
             _logger = logger;
             int pin = dht22Settings.Value.Pin;
             var controller = new GpioController();
+            _logger.LogInformation($"Pin: {pin}");
             _dht22 = new Dht22(pin);
         }
 
@@ -28,7 +29,7 @@ namespace Dht22Reader {
                 bool success = _dht22.TryReadHumidity(out humidity) && _dht22.TryReadTemperature(out temperature);
 
                 if (!success){
-                    _logger.LogInformation($"Could not read from DHT22 sensor: {temperature}, {humidity} ");
+                    _logger.LogError($"Could not read from DHT22 sensor: {temperature}, {humidity} ");
                     return null;
                 }
 
