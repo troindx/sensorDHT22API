@@ -28,7 +28,7 @@ namespace Dht22Reader {
                 bool success = _dht22.TryReadHumidity(out humidity) && _dht22.TryReadTemperature(out temperature);
 
                 if (!success){
-                    _logger.LogError($"Error reading DHT22 sensor: {temperature}, {humidity} ");
+                    _logger.LogInformation($"Could not read from DHT22 sensor: {temperature}, {humidity} ");
                     return null;
                 }
 
