@@ -22,9 +22,17 @@ namespace Dht22Reader {
             _pin = dht22Settings.Value.Pin;
             _controller = new GpioController();
             try
-            {
-                 _controller.OpenPin(_pin, PinMode.Output);
-                 _dht22 = new Dht22(_pin);
+            { 
+                if (_controller.IsPinModeSupported(_pin, PinMode.Output)){
+                    _controller.OpenPin(_pin, PinMode.Output); 
+                }
+                else {
+                    logger.LogError($"Pin not supported for output: {_pin}");
+                    throw new Exception($"Pin not supported for output: {_pin}");
+
+                }
+                _dht22 = new Dht22(_pin);
+                
             }
             catch (System.Exception error)
             {
@@ -43,7 +51,7 @@ namespace Dht22Reader {
         public void Dispose()
         {
             Dispose(true);
-            GC.SuppressFinalize(this);  // Prevent finalizer from running
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -58,7 +66,10 @@ namespace Dht22Reader {
                         if (_controller.IsPinOpen(_pin))
                         {
                             _controller.ClosePin(_pin);
-                            _logger.LogInformation($"DHT22Service closed pin: {_pin}");
+                            _logger.LogInformation($"DHT22Service closed pin: {_pin}.");
+                        }
+                        else {
+                             _logger.LogInformation($"DHT222 pin {_pin} was not open.");
                         }
                         _controller.Dispose();
                     }
