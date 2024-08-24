@@ -1,0 +1,14 @@
+{ 
+  "Dht22Settings": {
+    "Pin": 18
+  },
+  "ConnectionStrings": {
+    "MariaDBConnection": "Server=your_server_ip;Database=sensordata;User=your_user;Password=your_password;"
+},
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}
