@@ -16,6 +16,7 @@ namespace Dht22Reader {
             _logger = logger;
             int pin = dht22Settings.Value.Pin;
             var controller = new GpioController();
+            controller.OpenPin(pin, PinMode.Output);
             _logger.LogInformation($"Pin: {pin}");
             _dht22 = new Dht22(pin);
         }
