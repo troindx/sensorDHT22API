@@ -8,10 +8,10 @@ using UnitsNet;
 namespace Dht22Reader {
     public class Dht22Service
     {
-        private readonly ILogger<Dht22Service> _logger;
+        private readonly ILogger _logger;
         private readonly Dht22 _dht22;
 
-        public Dht22Service(ILogger<Dht22Service> logger, IOptions<Dht22Settings> dht22Settings)
+        public Dht22Service(ILogger logger, IOptions<Dht22Settings> dht22Settings)
         {
             _logger = logger;
             int pin = dht22Settings.Value.Pin;

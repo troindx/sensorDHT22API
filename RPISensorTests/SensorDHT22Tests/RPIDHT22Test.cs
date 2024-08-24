@@ -5,13 +5,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Dht22Reader;
 using UnitsNet;
-
+using RPILogger;
+using Xunit.Abstractions;
 public class Dht22ServiceTests
 {
     private readonly Dht22Service _dht22Service;
     private readonly IConfigurationRoot _configuration;
 
-    public Dht22ServiceTests()
+    public Dht22ServiceTests(ITestOutputHelper output)
     {
         _configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.Development.json")
@@ -19,7 +20,8 @@ public class Dht22ServiceTests
 
         var environmentSettings = _configuration.GetSection("Dht22Settings").Get<Dht22Settings>();
 
-        var logger = new NullLogger<Dht22Service>();
+        var loggerFactory = TestLoggerFactory.Create(output);
+        var logger = loggerFactory.CreateLogger("RPITests");
         var dht22Settings = Options.Create(new Dht22Settings { Pin = 1 });
         _dht22Service = new Dht22Service(logger, dht22Settings);
     }
