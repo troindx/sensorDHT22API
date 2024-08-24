@@ -23,12 +23,12 @@ namespace Dht22Reader {
             _controller = new GpioController();
             try
             { 
-                if (_controller.IsPinModeSupported(_pin, PinMode.Output)){
-                    _controller.OpenPin(_pin, PinMode.Output); 
+                if (_controller.IsPinModeSupported(_pin, PinMode.InputPullUp)){
+                    _controller.OpenPin(_pin, PinMode.InputPullUp); 
                 }
                 else {
-                    logger.LogError($"Pin not supported for output: {_pin}");
-                    throw new Exception($"Pin not supported for output: {_pin}");
+                    logger.LogError($"Pin not supported for Input: {_pin}");
+                    throw new Exception($"Pin not supported for Input: {_pin}");
 
                 }
                 _dht22 = new Dht22(_pin);
