@@ -1,5 +1,6 @@
 using SensorDataAPI.Data;
 using SensorDataAPI.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 

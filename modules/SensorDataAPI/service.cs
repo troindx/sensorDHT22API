@@ -20,7 +20,7 @@ namespace SensorDataAPI.Services
             return await _context.SensorReadings.ToListAsync();
         }
 
-        public async Task<SensorReading> GetByIdAsync(int id)
+        public async Task<SensorReading?> GetByIdAsync(int id)
         {
             return await _context.SensorReadings.FindAsync(id);
         }
