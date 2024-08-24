@@ -18,11 +18,20 @@ namespace Dht22Reader {
         public Dht22Service(ILogger logger, IOptions<Dht22Settings> dht22Settings)
         {
             _logger = logger;
+            _logger.LogInformation($"DHT22 Pin: {_pin}");
             _pin = dht22Settings.Value.Pin;
             _controller = new GpioController();
-            _controller.OpenPin(_pin, PinMode.Output);
-            _logger.LogInformation($"Pin: {_pin}");
-            _dht22 = new Dht22(_pin);
+            try
+            {
+                 _controller.OpenPin(_pin, PinMode.Output);
+                 _dht22 = new Dht22(_pin);
+            }
+            catch (System.Exception error)
+            {
+                logger.LogError($"Error on DHT22Service constructor: {error.Message}");
+                throw;
+            }
+            
         }
 
          ~Dht22Service()
@@ -49,6 +58,7 @@ namespace Dht22Reader {
                         if (_controller.IsPinOpen(_pin))
                         {
                             _controller.ClosePin(_pin);
+                            _logger.LogInformation($"DHT22Service closed pin: {_pin}");
                         }
                         _controller.Dispose();
                     }
