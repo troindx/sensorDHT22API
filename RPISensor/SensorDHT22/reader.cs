@@ -18,8 +18,8 @@ namespace Dht22Reader {
         public Dht22Service(ILogger logger, IOptions<Dht22Settings> dht22Settings)
         {
             _logger = logger;
-            _logger.LogInformation($"DHT22 Pin: {_pin}");
             _pin = dht22Settings.Value.Pin;
+            _logger.LogInformation($"DHT22 Pin: {_pin}");
             _controller = new GpioController();
             try
             { 
