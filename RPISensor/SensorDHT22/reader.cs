@@ -6,19 +6,55 @@ using Microsoft.Extensions.Options;
 using UnitsNet;
 
 namespace Dht22Reader {
-    public class Dht22Service
+    public class Dht22Service : IDisposable
     {
         private readonly ILogger _logger;
         private readonly Dht22 _dht22;
 
+        private GpioController _controller;
+        private bool _disposed = false;
+        private int _pin;
+
         public Dht22Service(ILogger logger, IOptions<Dht22Settings> dht22Settings)
         {
             _logger = logger;
-            int pin = dht22Settings.Value.Pin;
-            var controller = new GpioController();
-            controller.OpenPin(pin, PinMode.Output);
-            _logger.LogInformation($"Pin: {pin}");
-            _dht22 = new Dht22(pin);
+            _pin = dht22Settings.Value.Pin;
+            _controller = new GpioController();
+            _controller.OpenPin(_pin, PinMode.Output);
+            _logger.LogInformation($"Pin: {_pin}");
+            _dht22 = new Dht22(_pin);
+        }
+
+         ~Dht22Service()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);  // Prevent finalizer from running
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposed)
+            {
+                if (disposing)
+                {
+                    // Dispose managed state (managed objects)
+                    if (_controller != null)
+                    {
+                        if (_controller.IsPinOpen(_pin))
+                        {
+                            _controller.ClosePin(_pin);
+                        }
+                        _controller.Dispose();
+                    }
+                }
+                _disposed = true;
+            }
         }
 
         public (Temperature Temperature, RelativeHumidity Humidity)? ReadSensorData()
