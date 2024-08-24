@@ -1,7 +1,7 @@
 using SensorDataAPI.Data;
 using SensorDataAPI.Services;
 using Microsoft.EntityFrameworkCore;
-
+using Dht22Reader;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
-
+builder.Services.Configure<Dht22Settings>(builder.Configuration.GetSection("Dht22Settings"));
 // Configure MariaDB connection
 var connectionString = builder.Configuration.GetConnectionString("MariaDBConnection");
 builder.Services.AddDbContext<SensorDataContext>(options =>
