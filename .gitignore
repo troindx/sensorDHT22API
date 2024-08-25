@@ -84,3 +84,9 @@ __pycache__/
 
 # macOS specific
 *.DS_Store
+
+# Ignore everything in the RPIDHT22Driver folder
+RPIDHT22Driver/*
+
+# But do not ignore rpidht22driver.c
+!RPIDHT22Driver/rpidht22driver.c

@@ -32,8 +32,8 @@ namespace Dht22Reader
             {
                 var psi = new ProcessStartInfo
                 {
-                    FileName = "/usr/bin/sudo", // Assuming the executable needs sudo to run
-                    Arguments = $"{_executablePath} {_pin}", // Pass the executable path and the pin as arguments
+                    FileName = $"{_executablePath}",
+                    Arguments = $"{_pin}",
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true
@@ -47,7 +47,7 @@ namespace Dht22Reader
 
                     if (process.ExitCode == 0)
                     {
-                        var data = output.Trim().Split(';'); // Changed to split by semicolon
+                        var data = output.Trim().Split(';');
                         if (data.Length == 2 &&
                             double.TryParse(data[0], out var tempValue) &&
                             double.TryParse(data[1], out var humidityValue))

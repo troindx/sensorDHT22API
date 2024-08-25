@@ -19,5 +19,4 @@ Once this is done, you'll need to compile the driver
 cd  RPIDHTDriver
 gcc -o rptidht22driver rpidht22driver.c -lwiringPi
 ```
-And then run the command ./rpidht22driver <GPIO pin_number>, the home made driver will return two numbers. The C# application uses this command to read the data
-The driver must be ran with sudo priviledges in the raspberry pi, in order for it to have full access to the GPIO pins
+The application then runs the command ./rpidht22driver <GPIO pin_number>, the home made driver will return two numbers as Temperature and Humidity. The C# application uses this command to read the data
