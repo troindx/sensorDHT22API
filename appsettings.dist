@@ -1,6 +1,7 @@
 { 
   "Dht22Settings": {
-    "Pin": 18
+    "Pin": 26,
+    "ExecutablePath": "./RPIDHT22Driver/rpidht22driver
   },
   "ConnectionStrings": {
     "MariaDBConnection": "Server=your_server_ip;Database=sensordata;User=your_user;Password=your_password;"

@@ -1,102 +1,79 @@
 using System;
-using System.Device.Gpio;
-using Iot.Device.DHTxx;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using UnitsNet;
 
-namespace Dht22Reader {
-    public class Dht22Service : IDisposable
+namespace Dht22Reader
+{
+    public class Dht22Service
     {
         private readonly ILogger _logger;
-        private readonly Dht22 _dht22;
-
-        private GpioController _controller;
-        private bool _disposed = false;
-        private int _pin;
+        private readonly string _executablePath;
+        private readonly int _pin;
 
         public Dht22Service(ILogger logger, IOptions<Dht22Settings> dht22Settings)
         {
             _logger = logger;
+            _executablePath = dht22Settings.Value.ExecutablePath;
             _pin = dht22Settings.Value.Pin;
-            _logger.LogInformation($"DHT22 Pin: {_pin}");
-            _controller = new GpioController();
-            try
-            { 
-                if (_controller.IsPinModeSupported(_pin, PinMode.InputPullUp)){
-                    _controller.OpenPin(_pin, PinMode.InputPullUp); 
-                }
-                else {
-                    logger.LogError($"Pin not supported for Input: {_pin}");
-                    throw new Exception($"Pin not supported for Input: {_pin}");
 
-                }
-                _dht22 = new Dht22(_pin);
-                
-            }
-            catch (System.Exception error)
-            {
-                logger.LogError($"Error on DHT22Service constructor: {error.Message}");
-                throw;
-            }
-            
+            _logger.LogInformation($"DHT22 executable path: {_executablePath}");
+            _logger.LogInformation($"DHT22 GPIO pin: {_pin}");
         }
 
-         ~Dht22Service()
+        ~Dht22Service()
         {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(false);
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposed)
-            {
-                if (disposing)
-                {
-                    // Dispose managed state (managed objects)
-                    if (_controller != null)
-                    {
-                        if (_controller.IsPinOpen(_pin))
-                        {
-                            _controller.ClosePin(_pin);
-                            _logger.LogInformation($"DHT22Service closed pin: {_pin}.");
-                        }
-                        else {
-                             _logger.LogInformation($"DHT222 pin {_pin} was not open.");
-                        }
-                        _controller.Dispose();
-                    }
-                }
-                _disposed = true;
-            }
         }
 
         public (Temperature Temperature, RelativeHumidity Humidity)? ReadSensorData()
         {
             try
             {
-                Temperature temperature = default;
-                RelativeHumidity humidity = default;
-                bool success = _dht22.TryReadHumidity(out humidity) && _dht22.TryReadTemperature(out temperature);
+                var psi = new ProcessStartInfo
+                {
+                    FileName = "/usr/bin/sudo", // Assuming the executable needs sudo to run
+                    Arguments = $"{_executablePath} {_pin}", // Pass the executable path and the pin as arguments
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
 
-                if (!success){
-                    _logger.LogError($"Could not read from DHT22 sensor: {temperature}, {humidity} ");
-                    return null;
+                using (var process = Process.Start(psi))
+                {
+                    if (process == null) return null;
+                    var output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (process.ExitCode == 0)
+                    {
+                        var data = output.Trim().Split(';'); // Changed to split by semicolon
+                        if (data.Length == 2 &&
+                            double.TryParse(data[0], out var tempValue) &&
+                            double.TryParse(data[1], out var humidityValue))
+                        {
+                            var temperature = Temperature.FromDegreesCelsius(tempValue);
+                            var humidity = RelativeHumidity.FromPercent(humidityValue);
+
+                            _logger.LogInformation($"Temperature: {temperature}°C, Humidity: {humidity}%");
+                            return (temperature, humidity);
+                        }
+                        else
+                        {
+                            _logger.LogError("Unexpected output format");
+                            return null;
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogError($"DHT22 reader executable failed with exit code {process.ExitCode}");
+                        return null;
+                    }
                 }
-
-                _logger.LogInformation($"Temperature: {temperature}°C, Humidity: {humidity}%");
-                return (temperature, humidity);
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Error reading DHT22 sensor: {ex.Message}");
+                _logger.LogError($"Error reading DHT22 sensor via executable: {ex.Message}");
                 return null;
             }
         }
