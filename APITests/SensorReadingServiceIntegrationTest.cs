@@ -17,10 +17,10 @@ namespace SensorDataAPI.Tests
 
         public SensorReadingServiceIntegrationTests()
         {
-            // Set up the DbContext with a connection string to the Docker container
             var options = new DbContextOptionsBuilder<SensorDataContext>()
-                .UseMySql("Server=localhost;Database=SensorData;User=sensor_user;Password=sensor_password;", 
-                          new MySqlServerVersion(new Version(8, 0, 21)))
+                //.UseMySql("Server=localhost;Database=SensorData;User=sensor_user;Password=sensor_password;", 
+                //          new MySqlServerVersion(new Version(8, 0, 21))) // Set up the DbContext with a connection string to the Docker container
+                .UseInMemoryDatabase("SensorDataTestDb") // or Use InMemory database for testing
                 .Options;
 
             _context = new SensorDataContext(options);
