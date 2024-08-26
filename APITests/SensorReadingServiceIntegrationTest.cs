@@ -3,9 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using SensorDataAPI.Data;
 using SensorDataAPI.Models;
 using SensorDataAPI.Services;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace SensorDataAPI.Tests

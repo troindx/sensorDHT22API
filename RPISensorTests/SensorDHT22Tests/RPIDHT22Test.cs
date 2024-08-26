@@ -5,10 +5,17 @@ using Dht22Reader;
 using UnitsNet;
 using RPILogger;
 using Xunit.Abstractions;
+using Microsoft.EntityFrameworkCore;
+using SensorDataAPI.Data;
+using SensorDataAPI.Services;
+using FluentAssertions;
+using System.Threading.Tasks;
+
 public class Dht22ServiceTests
 {
     private readonly Dht22Service _dht22Service;
     private readonly IConfigurationRoot _configuration;
+    private readonly SensorDataContext _context;
 
     public Dht22ServiceTests(ITestOutputHelper output)
     {
@@ -23,7 +30,15 @@ public class Dht22ServiceTests
             Pin = environmentSettings.Pin, 
             ExecutablePath = environmentSettings.ExecutablePath
         });
-        _dht22Service = new Dht22Service(logger, dht22Settings);
+        var options = new DbContextOptionsBuilder<SensorDataContext>()
+            .UseInMemoryDatabase("SensorDataTestDb")
+            .Options;
+
+        _context = new SensorDataContext(options);
+        _context.Database.EnsureCreated(); // Ensure the in-memory database is created
+
+        var dbService = new SensorReadingService(_context);
+        _dht22Service = new Dht22Service(logger, dht22Settings, dbService);
     }
 
     [Fact]
@@ -43,5 +58,20 @@ public class Dht22ServiceTests
 
         // Check humidity range 0% to 99.9%
         Assert.InRange(humidityPercent, 0.0, 99.9);
+    }
+
+    [Fact]
+    public async Task ReadAndWriteSensorData_ShouldInsertSensorReading()
+    {
+        await _dht22Service.ReadAndWriteSensorData();
+
+        // Assert
+        var insertedReading = await _context.SensorReadings.FirstOrDefaultAsync();
+        insertedReading.Should().NotBeNull();
+        // Check temperature range -40 to 80°C
+        Assert.InRange(insertedReading.Temperature, -40.0, 80.0);
+
+        // Check humidity range 0% to 99.9%
+        Assert.InRange(insertedReading.Humidity, 0.0, 99.9);
     }
 }

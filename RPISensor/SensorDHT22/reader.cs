@@ -1,7 +1,7 @@
-using System;
 using System.Diagnostics;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using SensorDataAPI.Models;
+using SensorDataAPI.Services;
 using UnitsNet;
 
 namespace Dht22Reader
@@ -11,12 +11,14 @@ namespace Dht22Reader
         private readonly ILogger _logger;
         private readonly string _executablePath;
         private readonly int _pin;
+        private readonly SensorReadingService _dbService;
 
-        public Dht22Service(ILogger logger, IOptions<Dht22Settings> dht22Settings)
+        public Dht22Service(ILogger logger, IOptions<Dht22Settings> dht22Settings, SensorReadingService dbService)
         {
             _logger = logger;
             _executablePath = dht22Settings.Value.ExecutablePath;
             _pin = dht22Settings.Value.Pin;
+            _dbService = dbService;
 
             _logger.LogInformation($"DHT22 executable path: {_executablePath}");
             _logger.LogInformation($"DHT22 GPIO pin: {_pin}");
@@ -24,6 +26,25 @@ namespace Dht22Reader
 
         ~Dht22Service()
         {
+        }
+
+        public async Task WriteSensorData(Temperature Temperature, RelativeHumidity Humidity)
+        {
+            try
+            {
+                var reading = new SensorReading
+                {
+                    Time = DateTime.UtcNow,
+                    Temperature = Temperature.DegreesCelsius,
+                    Humidity = Humidity.Percent
+                };
+                await _dbService.CreateAsync(reading);
+            }
+            catch (System.Exception err)
+            {
+                _logger.LogError( err.Message);
+                throw;
+            }
         }
 
         public (Temperature Temperature, RelativeHumidity Humidity)? ReadSensorData()
@@ -60,7 +81,7 @@ namespace Dht22Reader
                         }
                         else
                         {
-                            _logger.LogError("Unexpected output format");
+                            _logger.LogWarning("Could not read temperature.");
                             return null;
                         }
                     }
@@ -75,6 +96,14 @@ namespace Dht22Reader
             {
                 _logger.LogError($"Error reading DHT22 sensor via executable: {ex.Message}");
                 return null;
+            }
+        }
+
+        public async Task ReadAndWriteSensorData(){
+            var sensorData = ReadSensorData();
+            if(sensorData.HasValue){
+                var (Temperature,Humidity) = sensorData.Value;
+                await WriteSensorData(Temperature, Humidity);
             }
         }
     }
