@@ -18,10 +18,15 @@ namespace SensorDataAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<SensorReading>>> Get()
+        public async Task<IActionResult> GetAll(
+            [FromQuery] DateTime? startDate = null,
+            [FromQuery] DateTime? endDate = null,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] int pageNumber = 0)
         {
-            var readings = await _service.GetAllAsync();
-            return Ok(readings);
+            var sensorReadings = await _service.GetAllAsync(pageSize, pageNumber,startDate, endDate );
+
+            return Ok(sensorReadings);
         }
 
         [HttpGet("{id}")]

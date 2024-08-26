@@ -5,7 +5,6 @@ The settings file can be found in appsettings.dist. File must be copied into app
 > **NOTE**: You must install and compile wiring-pi [here](https://github.com/WiringPi/WiringPi). 
 
 You may download their latest release from their Prebuilt binaries or build it yourselrf running the following command wherever you feel like installing WiringPi library. You'll also need the build-essential linux package.
-
 ```
 sudo apt update
 sudo apt install build-essential

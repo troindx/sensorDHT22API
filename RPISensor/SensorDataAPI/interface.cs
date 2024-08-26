@@ -6,7 +6,7 @@ namespace SensorDataAPI.Services
 {
     public interface ISensorReadingService
     {
-        Task<IEnumerable<SensorReading>> GetAllAsync();
+        Task<IEnumerable<SensorReading>> GetAllAsync(int pageSize , int pageNumber,DateTime? startDate ,  DateTime? endDate);
         Task<SensorReading?> GetByIdAsync(int id);
         Task CreateAsync(SensorReading reading);
         Task UpdateAsync(int id, SensorReading reading);

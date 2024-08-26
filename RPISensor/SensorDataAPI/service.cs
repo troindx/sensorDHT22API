@@ -15,9 +15,25 @@ namespace SensorDataAPI.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<SensorReading>> GetAllAsync()
+        public async Task<IEnumerable<SensorReading>> GetAllAsync(int pageSize = 10, int pageNumber = 0, DateTime? startDate = null, DateTime? endDate = null )
         {
-            return await _context.SensorReadings.ToListAsync();
+            var query = _context.SensorReadings.AsQueryable();
+
+            if (startDate.HasValue)
+            {
+                query = query.Where(sr => sr.Time >= startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                query = query.Where(sr => sr.Time <= endDate.Value);
+            }
+
+            return await query
+                .OrderBy(sr => sr.Id) // Ordering by date
+                .Skip(pageNumber * pageSize) // Skipping records for pagination
+                .Take(pageSize) // Taking the specified number of records
+                .ToListAsync();
         }
 
         public async Task<SensorReading?> GetByIdAsync(int id)

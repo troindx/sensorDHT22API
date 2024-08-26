@@ -1,6 +1,4 @@
-using System;
 using Xunit;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Dht22Reader;

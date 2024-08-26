@@ -4,7 +4,7 @@
     "ExecutablePath": "./RPIDHT22Driver/rpidht22driver"
   },
   "ConnectionStrings": {
-    "MariaDBConnection": "Server=your_server_ip;Database=sensordata;User=your_user;Password=your_password;"
+    "MariaDBConnection": "Server=localhost;Database=SensorData;User=sensor_data;Password=temporaryPasswordThatIsOk!;"
 },
   "Logging": {
     "LogLevel": {
