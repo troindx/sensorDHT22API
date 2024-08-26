@@ -28,7 +28,8 @@ public class Dht22ServiceTests
         var logger = loggerFactory.CreateLogger("RPITests");
         var dht22Settings = Options.Create(new Dht22Settings { 
             Pin = environmentSettings.Pin, 
-            ExecutablePath = environmentSettings.ExecutablePath
+            ExecutablePath = environmentSettings.ExecutablePath,
+            IntervalInMinutes = environmentSettings.IntervalInMinutes
         });
         var options = new DbContextOptionsBuilder<SensorDataContext>()
             .UseInMemoryDatabase("SensorDataTestDb")

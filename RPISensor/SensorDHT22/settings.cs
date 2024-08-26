@@ -3,5 +3,6 @@ namespace Dht22Reader{
     {
         public int Pin { get; set; }
         public required string ExecutablePath { get; set;}
+        public required int IntervalInMinutes {get; set;}
     }
 }
