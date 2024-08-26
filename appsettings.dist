@@ -1,7 +1,8 @@
 { 
   "Dht22Settings": {
     "Pin": 26,
-    "ExecutablePath": "./RPIDHT22Driver/rpidht22driver"
+    "ExecutablePath": "./RPIDHT22Driver/rpidht22driver",
+    "IntervalInMinutes": 2
   },
   "ConnectionStrings": {
     "MariaDBConnection": "Server=localhost;Database=SensorData;User=sensor_data;Password=temporaryPasswordThatIsOk!;"
