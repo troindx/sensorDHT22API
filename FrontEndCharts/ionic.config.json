@@ -1,0 +1,7 @@
+{
+  "name": "FrontEndCharts",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

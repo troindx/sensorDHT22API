@@ -27,6 +27,19 @@ public class Program
          // Register the background service
         builder.Services.AddSingleton<Dht22Service>(); // Ensure this is set up correctly with dependencies
         builder.Services.AddHostedService<SensorDataBackgroundService>();
+
+        // Configure CORS to allow all origins (in future it should only load from one IP but lets see)
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll",
+                builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+        });
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

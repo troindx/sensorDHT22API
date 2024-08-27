@@ -1,0 +1,22 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Temperature and Humidity
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">RPI Temperature and Humidity</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <app-sensor-chart
+  [startDate]="startDate"
+  [endDate]="endDate"
+  [pageSize]="10"
+  [pageNumber]="0">
+</app-sensor-chart>
+</ion-content>
