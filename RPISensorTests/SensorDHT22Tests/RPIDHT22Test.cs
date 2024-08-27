@@ -10,6 +10,9 @@ using SensorDataAPI.Data;
 using SensorDataAPI.Services;
 using FluentAssertions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Moq;
 
 public class Dht22ServiceTests
 {
@@ -25,7 +28,7 @@ public class Dht22ServiceTests
 
         var environmentSettings = _configuration.GetSection("Dht22Settings").Get<Dht22Settings>();
         var loggerFactory = TestLoggerFactory.Create(output);
-        var logger = loggerFactory.CreateLogger("RPITests");
+        ILogger<Dht22Service> logger = (ILogger<Dht22Service>)loggerFactory.CreateLogger("RPITests");
         var dht22Settings = Options.Create(new Dht22Settings { 
             Pin = environmentSettings.Pin, 
             ExecutablePath = environmentSettings.ExecutablePath,
@@ -39,7 +42,18 @@ public class Dht22ServiceTests
         _context.Database.EnsureCreated(); // Ensure the in-memory database is created
 
         var dbService = new SensorReadingService(_context);
-        _dht22Service = new Dht22Service(logger, dht22Settings, dbService);
+
+        // Create a mock or real IServiceScopeFactory
+        var serviceProvider = new ServiceCollection()
+            .AddSingleton(dbService)
+            .BuildServiceProvider();
+
+        var serviceScopeFactoryMock = new Mock<IServiceScopeFactory>();
+        var serviceScopeMock = new Mock<IServiceScope>();
+
+        serviceScopeMock.Setup(x => x.ServiceProvider).Returns(serviceProvider);
+        serviceScopeFactoryMock.Setup(x => x.CreateScope()).Returns(serviceScopeMock.Object);
+        _dht22Service = new Dht22Service(logger, dht22Settings, serviceScopeFactoryMock.Object);
     }
 
     [Fact]

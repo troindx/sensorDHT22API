@@ -8,17 +8,17 @@ namespace Dht22Reader
 {
     public class Dht22Service
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<Dht22Service> _logger;
         private readonly string _executablePath;
         private readonly int _pin;
-        private readonly SensorReadingService _dbService;
+        private readonly IServiceScopeFactory _scopeFactory;
 
-        public Dht22Service(ILogger logger, IOptions<Dht22Settings> dht22Settings, SensorReadingService dbService)
+        public Dht22Service(ILogger<Dht22Service> logger, IOptions<Dht22Settings> dht22Settings, IServiceScopeFactory scopeFactory)
         {
             _logger = logger;
             _executablePath = dht22Settings.Value.ExecutablePath;
             _pin = dht22Settings.Value.Pin;
-            _dbService = dbService;
+            _scopeFactory = scopeFactory;
 
             _logger.LogInformation($"DHT22 executable path: {_executablePath}");
             _logger.LogInformation($"DHT22 GPIO pin: {_pin}");
@@ -30,20 +30,24 @@ namespace Dht22Reader
 
         public async Task WriteSensorData(Temperature Temperature, RelativeHumidity Humidity)
         {
-            try
+            using (var scope = _scopeFactory.CreateScope())
             {
-                var reading = new SensorReading
+                var _dbService = scope.ServiceProvider.GetRequiredService<ISensorReadingService>();
+                try
                 {
-                    Time = DateTime.UtcNow,
-                    Temperature = Temperature.DegreesCelsius,
-                    Humidity = Humidity.Percent
-                };
-                await _dbService.CreateAsync(reading);
-            }
-            catch (System.Exception err)
-            {
-                _logger.LogError( err.Message);
-                throw;
+                    var reading = new SensorReading
+                    {
+                        Time = DateTime.UtcNow,
+                        Temperature = Temperature.DegreesCelsius,
+                        Humidity = Humidity.Percent
+                    };
+                    await _dbService.CreateAsync(reading);
+                }
+                catch (System.Exception err)
+                {
+                    _logger.LogError( err.Message);
+                    throw;
+                }
             }
         }
 

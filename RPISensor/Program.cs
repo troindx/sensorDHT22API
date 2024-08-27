@@ -8,6 +8,8 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
 
         // Add services to the container.
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -21,11 +23,10 @@ public class Program
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
         builder.Services.AddScoped<ISensorReadingService, SensorReadingService>();
-
+        
          // Register the background service
         builder.Services.AddSingleton<Dht22Service>(); // Ensure this is set up correctly with dependencies
         builder.Services.AddHostedService<SensorDataBackgroundService>();
-
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.

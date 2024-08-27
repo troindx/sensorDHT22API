@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SensorDataAPI.Data;
 using SensorDataAPI.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SensorDataAPI.Services
 {
