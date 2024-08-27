@@ -43,9 +43,9 @@ public class Dht22ServiceTests
 
         var dbService = new SensorReadingService(_context);
 
-        // Create a mock or real IServiceScopeFactory
+        // Register ISensorReadingService with its implementation
         var serviceProvider = new ServiceCollection()
-            .AddSingleton(dbService)
+            .AddSingleton<ISensorReadingService>(provider => new SensorReadingService(_context))
             .AddSingleton(_context)
             .BuildServiceProvider();
 
