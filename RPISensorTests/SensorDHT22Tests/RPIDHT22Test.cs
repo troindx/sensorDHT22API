@@ -28,7 +28,7 @@ public class Dht22ServiceTests
 
         var environmentSettings = _configuration.GetSection("Dht22Settings").Get<Dht22Settings>();
         var loggerFactory = TestLoggerFactory.Create(output);
-        ILogger<Dht22Service> logger = (ILogger<Dht22Service>)loggerFactory.CreateLogger("RPITests");
+        var logger = loggerFactory.CreateLogger<Dht22Service>();
         var dht22Settings = Options.Create(new Dht22Settings { 
             Pin = environmentSettings.Pin, 
             ExecutablePath = environmentSettings.ExecutablePath,
