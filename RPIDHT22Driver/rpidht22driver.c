@@ -35,7 +35,7 @@ int read_dht_data(int pin, float *temperature, float *humidity)
         while (digitalRead(pin) == laststate)
         {
             counter++;
-            delayMicroseconds(2); // Increase delay between checks (from 1 to 2)
+            delayMicroseconds(2);
             if (counter == 255)
             {
                 break;
