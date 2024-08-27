@@ -46,6 +46,7 @@ public class Dht22ServiceTests
         // Create a mock or real IServiceScopeFactory
         var serviceProvider = new ServiceCollection()
             .AddSingleton(dbService)
+            .AddSingleton(_context)
             .BuildServiceProvider();
 
         var serviceScopeFactoryMock = new Mock<IServiceScopeFactory>();
