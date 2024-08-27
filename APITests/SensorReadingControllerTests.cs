@@ -200,12 +200,11 @@ namespace SensorDataAPI.Tests
                 await _client.PostAsJsonAsync("/api/sensorreadings", reading);
             }
 
-            var startDate = DateTime.UtcNow.AddDays(-8).ToString("yyyy-MM-ddTHH:mm:ssZ");
-            var endDate = DateTime.UtcNow.AddDays(-6).ToString("yyyy-MM-ddTHH:mm:ssZ");
+            var startDate = DateTime.UtcNow.AddDays(-9).ToString("yyyy-MM-ddTHH:mm:ssZ");
+            var endDate = DateTime.UtcNow.AddDays(2).ToString("yyyy-MM-ddTHH:mm:ssZ");
             var pageSize = 2;
-            var pageNumber = 0;
+            var pageNumber = 1;
 
-            // Act: Retrieve the second page of sensor readings
             var response = await _client.GetAsync($"/api/sensorreadings?startDate={startDate}&endDate={endDate}&pageSize={pageSize}&pageNumber={pageNumber}");
             response.EnsureSuccessStatusCode();
 
