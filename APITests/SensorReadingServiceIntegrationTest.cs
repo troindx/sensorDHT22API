@@ -151,8 +151,8 @@ namespace SensorDataAPI.Tests
             // Assert
             result.Should().NotBeNull();
             result.Should().HaveCount(2); // Should only return 2 readings per page
-            result.First().Temperature.Should().Be(24); // The first reading on page 1
-            result.Last().Temperature.Should().Be(25); // The last reading on page 1
+            result.First().Temperature.Should().Be(25); // The first reading on page 1
+            result.Last().Temperature.Should().Be(24); // The last reading on page 1
         }
 
         [Fact]
@@ -183,8 +183,37 @@ namespace SensorDataAPI.Tests
             // Assert
             result.Should().NotBeNull();
             result.Should().HaveCount(2); // Should only return 2 readings
-            result.First().Temperature.Should().Be(22.5); // The first reading on page 2
+            result.First().Temperature.Should().Be(25); // The first reading on page 2
             result.Last().Temperature.Should().Be(24.0); // The last reading on page 2
+        }
+
+        [Fact]
+        public async Task GetAllAsync_ShouldReturnAllWithoutDatesResults()
+        {
+
+            // Arrange: Add some sensor readings with different dates
+            var readings = new List<SensorReading>
+            {
+                new SensorReading { Time = DateTime.UtcNow.AddDays(-3), Temperature = 20.5, Humidity = 40 },
+                new SensorReading { Time = DateTime.UtcNow.AddDays(-2), Temperature = 22.5, Humidity = 45 },
+                new SensorReading { Time = DateTime.UtcNow.AddDays(-1), Temperature = 24.0, Humidity = 50 },
+                new SensorReading { Time = DateTime.UtcNow, Temperature = 25.0, Humidity = 55 }
+            };
+
+            foreach (var reading in readings)
+            {
+                await _service.CreateAsync(reading);
+            }
+
+            var pageSize = 20;
+            var pageNumber = 0;
+
+            // Act: Retrieve filtered and paginated sensor readings
+            var result = await _service.GetAllAsync(pageSize, pageNumber);
+
+            // Assert
+            result.Should().NotBeNull();
+            result.Should().HaveCount(4); // Should only return 2 readings per page
         }
 
 

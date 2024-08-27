@@ -74,7 +74,7 @@ namespace SensorDataAPI.Tests
             // Assert
             response.EnsureSuccessStatusCode();
             var readings = await response.Content.ReadFromJsonAsync<List<SensorReading>>();
-
+            Assert.NotNull(readings);
             readings.Should().NotBeNull();
             readings.Should().HaveCountGreaterOrEqualTo(2);
             readings.Should().ContainEquivalentOf(reading1, options => options.Excluding(r => r.Id));
@@ -149,12 +149,13 @@ namespace SensorDataAPI.Tests
     [Fact]
         public async Task GetAllEndpoint_ShouldReturnFilteredAndPaginatedResults()
         {
+
             // Arrange: Add some sensor readings with different dates
             var readings = new List<SensorReading>
             {
-                new SensorReading { Time = DateTime.UtcNow.AddDays(-3), Temperature = 20.5, Humidity = 40 },
-                new SensorReading { Time = DateTime.UtcNow.AddDays(-2), Temperature = 22.5, Humidity = 45 },
-                new SensorReading { Time = DateTime.UtcNow.AddDays(-1), Temperature = 24.0, Humidity = 50 },
+                new SensorReading { Time = DateTime.UtcNow.AddDays(-5), Temperature = 20.5, Humidity = 40 },
+                new SensorReading { Time = DateTime.UtcNow.AddDays(-4), Temperature = 22.5, Humidity = 45 },
+                new SensorReading { Time = DateTime.UtcNow.AddDays(-3), Temperature = 24.0, Humidity = 50 },
                 new SensorReading { Time = DateTime.UtcNow, Temperature = 25.0, Humidity = 55 }
             };
 
@@ -163,10 +164,10 @@ namespace SensorDataAPI.Tests
                 await _client.PostAsJsonAsync("/api/sensorreadings", reading);
             }
 
-            var startDate = DateTime.UtcNow.AddDays(-2).ToString("yyyy-MM-ddTHH:mm:ssZ");
-            var endDate = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            var startDate = DateTime.UtcNow.AddDays(-5).ToString("yyyy-MM-ddTHH:mm:ssZ");
+            var endDate = DateTime.UtcNow.AddDays(-3).ToString("yyyy-MM-ddTHH:mm:ssZ");
             var pageSize = 2;
-            var pageNumber = 1;
+            var pageNumber = 0;
 
             // Act: Retrieve filtered and paginated sensor readings
             var response = await _client.GetAsync($"/api/sensorreadings?startDate={startDate}&endDate={endDate}&pageSize={pageSize}&pageNumber={pageNumber}");
@@ -178,8 +179,8 @@ namespace SensorDataAPI.Tests
             Assert.NotNull(result);
             result.Should().NotBeNull();
             result.Should().HaveCount(2); // Should only return 2 readings
-            result.First().Temperature.Should().Be(24.0); // The first reading on page 1
-            result.Last().Temperature.Should().Be(22.5); // The last reading on page 1
+            result.First().Temperature.Should().Be(22.5); // The first reading on page 1
+            result.Last().Temperature.Should().Be(20.5); // The last reading on page 1
         }
 
         [Fact]
@@ -188,9 +189,9 @@ namespace SensorDataAPI.Tests
             // Arrange: Add some sensor readings with different dates
             var readings = new List<SensorReading>
             {
-                new SensorReading { Time = DateTime.UtcNow.AddDays(-3), Temperature = 20.5, Humidity = 40 },
-                new SensorReading { Time = DateTime.UtcNow.AddDays(-2), Temperature = 22.5, Humidity = 45 },
-                new SensorReading { Time = DateTime.UtcNow.AddDays(-1), Temperature = 24.0, Humidity = 50 },
+                new SensorReading { Time = DateTime.UtcNow.AddDays(-8), Temperature = 30.5, Humidity = 40 },
+                new SensorReading { Time = DateTime.UtcNow.AddDays(-7), Temperature = 32.5, Humidity = 45 },
+                new SensorReading { Time = DateTime.UtcNow.AddDays(-6), Temperature = 34.0, Humidity = 50 },
                 new SensorReading { Time = DateTime.UtcNow, Temperature = 25.0, Humidity = 55 }
             };
 
@@ -199,8 +200,8 @@ namespace SensorDataAPI.Tests
                 await _client.PostAsJsonAsync("/api/sensorreadings", reading);
             }
 
-            var startDate = DateTime.UtcNow.AddDays(-3).ToString("yyyy-MM-ddTHH:mm:ssZ");
-            var endDate = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ");
+            var startDate = DateTime.UtcNow.AddDays(-8).ToString("yyyy-MM-ddTHH:mm:ssZ");
+            var endDate = DateTime.UtcNow.AddDays(-6).ToString("yyyy-MM-ddTHH:mm:ssZ");
             var pageSize = 2;
             var pageNumber = 0;
 
@@ -214,8 +215,8 @@ namespace SensorDataAPI.Tests
             Assert.NotNull(result);
             result.Should().NotBeNull();
             result.Should().HaveCount(2); // Should only return 2 readings
-            result.First().Temperature.Should().Be(20.5); // The first reading on page 2
-            result.Last().Temperature.Should().Be(22.5); // The last reading on page 2
+            result.First().Temperature.Should().Be(32.5); // The first reading on page 2
+            result.Last().Temperature.Should().Be(30.5); // The last reading on page 2
         }
 
     }

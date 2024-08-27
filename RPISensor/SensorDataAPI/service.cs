@@ -28,7 +28,7 @@ namespace SensorDataAPI.Services
             }
 
             return await query
-                .OrderBy(sr => sr.Id) // Ordering by date
+                .OrderByDescending(sr => sr.Id) // Ordering by id
                 .Skip(pageNumber * pageSize) // Skipping records for pagination
                 .Take(pageSize) // Taking the specified number of records
                 .ToListAsync();
