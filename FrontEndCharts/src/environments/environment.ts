@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  apiURL: 'https://192.168.1.131:5192/api/sensorreadings'
+  apiURL: 'http://192.168.1.131:5192/api/sensorreadings'
 };
 
 /*

@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 export class SensorChartComponent implements OnInit {
   @Input() startDate?: Date;
   @Input() endDate?: Date;
-  @Input() pageSize: number = 10;
+  @Input() pageSize: number = 20;
   @Input() pageNumber: number = 0;
 
   sensorData: SensorReading[] = [];
