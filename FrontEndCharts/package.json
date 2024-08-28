@@ -1,13 +1,13 @@
 {
-  "name": "FrontEndCharts",
-  "version": "0.0.1",
-  "author": "Ionic Framework",
-  "homepage": "https://ionicframework.com/",
+  "name": "com.hamrodev.rpi-charts",
+  "version": "1.0.0",
+  "author": "Hamro Dev",
+  "homepage": "https://hamrodev.com/",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
-    "build-ci": "ng build --base-href /rpi/",
+    "build-ci": "ng build --prod --base-href /rpi/",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "test-ci" : "ng test --no-watch --browsers=ChromeHeadless",
