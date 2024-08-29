@@ -1,4 +1,6 @@
+<ion-spinner *ngIf="isLoading" name="crescent"></ion-spinner>
 <ngx-charts-line-chart
+*ngIf="!isLoading"
   [view]="view"
   [scheme]="colorScheme"
   [results]="chartData"
@@ -11,5 +13,8 @@
   [xAxisLabel]="xAxisLabel"
   [yAxisLabel]="yAxisLabel"
   style="fill: #ffffff;"
+  [showGridLines]="false"
   [yScaleMax]="100">
 </ngx-charts-line-chart>
+
+

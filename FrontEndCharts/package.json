@@ -10,7 +10,7 @@
     "build-ci": "ng build --base-href /rpi/ --configuration=production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "test-ci" : "ng test --no-watch --browsers=ChromeHeadless",
+    "test-ci": "ng test --no-watch --browsers=ChromeHeadless",
     "lint": "ng lint"
   },
   "private": true,
@@ -28,7 +28,9 @@
     "@capacitor/haptics": "6.0.1",
     "@capacitor/keyboard": "6.0.2",
     "@capacitor/status-bar": "6.0.1",
+    "@capacitor/toast": "^6.0.2",
     "@ionic/angular": "^8.0.0",
+    "@ionic/pwa-elements": "^3.3.0",
     "@swimlane/ngx-charts": "^20.5.0",
     "ionicons": "^7.2.1",
     "rxjs": "~7.8.0",

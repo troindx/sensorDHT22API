@@ -2,13 +2,14 @@ import { Component, OnInit, Input, OnChanges, SimpleChanges, HostListener } from
 import { SensorDataService, SensorReading } from '../../services/sensor-data.service';
 import { Color, NgxChartsModule, ScaleType } from '@swimlane/ngx-charts';
 import { CommonModule } from '@angular/common';
-
+import { Toast } from '@capacitor/toast';
+import { IonSpinner, IonContent} from '@ionic/angular/standalone';
 @Component({
   selector: 'app-sensor-chart',
   templateUrl: './sensor-chart.component.html',
   styleUrls: ['./sensor-chart.component.scss'],
   standalone : true,
-  imports: [ NgxChartsModule, CommonModule],
+  imports: [ NgxChartsModule, CommonModule, IonSpinner, IonContent],
 })
 export class SensorChartComponent implements OnInit, OnChanges {
   @Input() startDate?: Date;
@@ -35,6 +36,8 @@ export class SensorChartComponent implements OnInit, OnChanges {
     selectable: true,
     name: 'Temperature and Humidity',
   };
+  isLoading: boolean = true;
+  isFirstLoad: boolean = true;
   
   colorSchemeDark: Color = {
     domain: ['#1E88E5', '#D32F2F', '#FFC107', '#757575'],
@@ -52,7 +55,7 @@ export class SensorChartComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     this.updateChartSize();
-    this.loadSensorData();
+    this.loadSensorData(true);
   }
 
 
@@ -83,14 +86,30 @@ export class SensorChartComponent implements OnInit, OnChanges {
     this.loadSensorData();
   }
 
-  loadSensorData() {
+  loadSensorData(showLoading: boolean = false) {
+    if (showLoading) {
+      this.isLoading = true;
+    }
     const formattedStartDate = this.isValidDate(this.startDate) ? new Date(this.startDate!) : undefined;
     const formattedEndDate = this.isValidDate(this.endDate) ? new Date(this.endDate!) : undefined;
     this.sensorDataService
       .getSensorData(this.pageSize, this.pageNumber,formattedStartDate, formattedEndDate)
-      .subscribe((data) => {
-        this.sensorData = data;
-        this.prepareChartData();
+      .subscribe({
+        next: (data) => {
+          this.sensorData = data;
+          this.prepareChartData();
+          if (showLoading) {
+            this.isLoading = false;
+            this.showToastMessage('Data has been loaded');
+          }
+          this.isFirstLoad = false; // Set to false after the first load
+        },
+        error: () => {
+          if (showLoading) {
+            this.isLoading = false;
+          }
+          this.showToastMessage('Error loading data', true);
+        }
       });
   }
 
@@ -116,6 +135,15 @@ export class SensorChartComponent implements OnInit, OnChanges {
     };
 
     this.chartData = [temperatureSeries, humiditySeries];
+  }
+
+  async showToastMessage(message: string, isError: boolean = false) {
+    await Toast.show({
+      text: message,
+      duration: 'short',
+      position: 'bottom',
+    
+    });
   }
 
 }
