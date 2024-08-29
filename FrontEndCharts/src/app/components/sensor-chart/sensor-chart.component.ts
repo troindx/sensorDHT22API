@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnChanges, SimpleChanges, HostListener } from '@angular/core';
 import { SensorDataService, SensorReading } from '../../services/sensor-data.service';
 import { Color, NgxChartsModule, ScaleType } from '@swimlane/ngx-charts';
 import { CommonModule } from '@angular/common';
@@ -10,10 +10,10 @@ import { CommonModule } from '@angular/common';
   standalone : true,
   imports: [ NgxChartsModule, CommonModule],
 })
-export class SensorChartComponent implements OnInit {
+export class SensorChartComponent implements OnInit, OnChanges {
   @Input() startDate?: Date;
   @Input() endDate?: Date;
-  @Input() pageSize: number = 20;
+  @Input() pageSize: number = 10;
   @Input() pageNumber: number = 0;
 
   sensorData: SensorReading[] = [];
@@ -25,29 +25,77 @@ export class SensorChartComponent implements OnInit {
   gradient = false;
   showLegend = true;
   showXAxisLabel = true;
-  xAxisLabel = 'Time';
+  xAxisLabel = 'Date and Time';
   showYAxisLabel = true;
-  yAxisLabel = 'Value';
-  colorScheme: Color = {
-    domain: ['#5AA454', '#C7B42C', '#A10A28', '#AAAAAA'],
+  yAxisLabel = 'Temperature (ºC),  Humidity (%)';
+  fillColor: string = '#000000';
+  colorSchemeLight: Color = {
+    domain: ['#5AA454', '#A10A28', '#C7B42C', '#AAAAAA'],
+    group: ScaleType.Ordinal,
+    selectable: true,
+    name: 'Temperature and Humidity',
+  };
+  
+  colorSchemeDark: Color = {
+    domain: ['#1E88E5', '#D32F2F', '#FFC107', '#757575'],
     group: ScaleType.Ordinal,
     selectable: true,
     name: 'Temperature and Humidity',
   };
 
-  constructor(private sensorDataService: SensorDataService) {}
+  colorScheme: Color ;
+  constructor(private sensorDataService: SensorDataService) {
+    this.colorScheme = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? this.colorSchemeDark
+      : this.colorSchemeLight;
+  }
 
   ngOnInit() {
+    this.updateChartSize();
+    this.loadSensorData();
+  }
+
+
+  @HostListener('window:change', ['$event'])
+  onThemeChange() {
+    this.updateColorScheme();  // Update color scheme when the theme changes
+  }
+
+  updateColorScheme() {
+    const isDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    this.colorScheme = isDarkMode ? this.colorSchemeDark : this.colorSchemeLight;
+    this.fillColor = isDarkMode ? '#ffffff' : '#000000';
+  }
+
+  updateChartSize() {
+    const width = window.innerWidth * 0.9; // Adjust width as needed (e.g., 90% of window width)
+    const height =width * (5/16);  // You can adjust this value or make it dynamic as well
+    this.view = [width, height];
+  }
+
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    this.updateChartSize();  // Update view size on window resize
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
     this.loadSensorData();
   }
 
   loadSensorData() {
+    const formattedStartDate = this.isValidDate(this.startDate) ? new Date(this.startDate!) : undefined;
+    const formattedEndDate = this.isValidDate(this.endDate) ? new Date(this.endDate!) : undefined;
     this.sensorDataService
-      .getSensorData(this.pageSize, this.pageNumber, this.startDate, this.endDate)
+      .getSensorData(this.pageSize, this.pageNumber,formattedStartDate, formattedEndDate)
       .subscribe((data) => {
         this.sensorData = data;
         this.prepareChartData();
       });
+  }
+
+  isValidDate(date: any): boolean {
+    return date instanceof Date && !isNaN(date.getTime());
   }
 
   prepareChartData() {
@@ -69,4 +117,5 @@ export class SensorChartComponent implements OnInit {
 
     this.chartData = [temperatureSeries, humiditySeries];
   }
+
 }

@@ -13,10 +13,55 @@
     </ion-toolbar>
   </ion-header>
 
+  <ion-item>
+    <ion-label class="datePickerLabel" position="stacked">Start Date</ion-label>
+    <ion-datetime-button datetime="startDate"></ion-datetime-button>
+  </ion-item>
+
+  <ion-modal [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime id="startDate"
+        display-format="YYYY-MM-DD HH:mm"
+        [(ngModel)]="startDate">
+      </ion-datetime>
+    </ng-template>
+  </ion-modal> <!-- This closing tag was missing -->
+
+  <ion-item>
+    <ion-label class="datePickerLabel" position="stacked">End Date</ion-label>
+    <ion-datetime-button datetime="endDate"></ion-datetime-button>
+  </ion-item>
+
+  <ion-modal [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime id="endDate"
+        display-format="YYYY-MM-DD HH:mm"
+        [(ngModel)]="endDate">
+      </ion-datetime>
+    </ng-template>
+  </ion-modal> <!-- This closing tag was missing -->
+
+  <ion-item>
+    <ion-label>Page Size</ion-label>
+    <ion-select [(ngModel)]="pageSize">
+      <ion-select-option value="10">10</ion-select-option>
+      <ion-select-option value="20">20</ion-select-option>
+      <ion-select-option value="50">50</ion-select-option>
+      <ion-select-option value="100">100</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-button (click)="previousPage()">Previous Page</ion-button>
+  <ion-button (click)="nextPage()">Next Page</ion-button>
+  <ion-item>
+    <ion-label> Page Number {{pageNumber}}</ion-label>
+  </ion-item>
+  <br><br><br>
+
   <app-sensor-chart
-  [startDate]="startDate"
-  [endDate]="endDate"
-  [pageSize]="10"
-  [pageNumber]="0">
-</app-sensor-chart>
+    [startDate]="startDate"
+    [endDate]="endDate"
+    [pageSize]="pageSize"
+    [pageNumber]="pageNumber">
+  </app-sensor-chart>
 </ion-content>
