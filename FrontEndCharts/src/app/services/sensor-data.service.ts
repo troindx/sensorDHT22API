@@ -21,7 +21,6 @@ export class SensorDataService {
     let params = new HttpParams()
       .set('pageSize', pageSize.toString())
       .set('pageNumber', pageNumber.toString());
-    console.log(startDate, endDate);
     if (startDate) {
       const date = new Date(startDate);
       params = params.set('startDate', this.formatDateToBackend(date));
