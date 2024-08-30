@@ -90,10 +90,9 @@ export class SensorChartComponent implements OnInit, OnChanges {
     if (showLoading) {
       this.isLoading = true;
     }
-    const formattedStartDate = this.isValidDate(this.startDate) ? new Date(this.startDate!) : undefined;
-    const formattedEndDate = this.isValidDate(this.endDate) ? new Date(this.endDate!) : undefined;
+
     this.sensorDataService
-      .getSensorData(this.pageSize, this.pageNumber,formattedStartDate, formattedEndDate)
+      .getSensorData(this.pageSize, this.pageNumber, this.startDate, this.endDate)
       .subscribe({
         next: (data) => {
           this.sensorData = data;
@@ -112,30 +111,42 @@ export class SensorChartComponent implements OnInit, OnChanges {
         }
       });
   }
-
+  
+  
   isValidDate(date: any): boolean {
+    // Check if the input is a Date object and is valid
     return date instanceof Date && !isNaN(date.getTime());
   }
+  
 
   prepareChartData() {
     const temperatureSeries = {
       name: 'Temperature',
       series: this.sensorData.map((reading) => ({
-        name: new Date(reading.time).toLocaleString(),
+        name: this.formatDateWithoutYear(new Date(reading.time)),
         value: reading.temperature,
       })),
     };
-
+  
     const humiditySeries = {
       name: 'Humidity',
       series: this.sensorData.map((reading) => ({
-        name: new Date(reading.time).toLocaleString(),
+        name: this.formatDateWithoutYear(new Date(reading.time)),
         value: reading.humidity,
       })),
     };
-
+  
     this.chartData = [temperatureSeries, humiditySeries];
   }
+  
+  formatDateWithoutYear(date: Date): string {
+    // Format the date to include only month, day, and time (e.g., "MM/DD HH:mm")
+    const options: Intl.DateTimeFormatOptions = { month: '2-digit', day: '2-digit' };
+    const datePart = date.toLocaleDateString(undefined, options);
+    const timePart = date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+    return `${datePart} ${timePart}`;
+  }
+  
 
   async showToastMessage(message: string, isError: boolean = false) {
     await Toast.show({
