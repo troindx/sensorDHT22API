@@ -1,5 +1,5 @@
 // src/router.ts
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import SensorForm from './components/SensorForm.vue'; 
 import SensorChart from './components/SensorChart.vue';
 
@@ -9,7 +9,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory((process.env.NODE_ENV === 'production') ? '/vuecharts/' : undefined),
   routes
 });
 
