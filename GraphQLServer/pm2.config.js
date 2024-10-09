@@ -5,7 +5,7 @@ module.exports = {
         script: "./dist/index.js", // Relative path to the compiled JavaScript file
         instances: 1, // Number of instances to run (can be 'max' for all cores)
         exec_mode: "fork", // Use fork mode
-        cwd: "/home/troin/apollo-server",
+        cwd: "/home/teamcity/apollo-server",
         env: {
           NODE_ENV: "production", // Set environment to production
         },
