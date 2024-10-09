@@ -19,7 +19,7 @@ export const typeDefs = gql(
 );
 
 export async function startApolloServer() {
-  const server = new ApolloServer({ typeDefs, resolvers });
+  const server = new ApolloServer({ typeDefs, resolvers, introspection: true });
   const { url } = await startStandaloneServer(server, {
     context: async () => {
       const { cache } = server;
