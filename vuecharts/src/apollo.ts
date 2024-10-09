@@ -2,7 +2,7 @@ import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client/core
 import { provideApolloClient } from '@vue/apollo-composable';
 
 const httpLink = createHttpLink({
-  uri: 'http://localhost:4000' 
+  uri: 'https://hamrodev.com/graphql' 
 });
 
 const apolloClient = new ApolloClient({
