@@ -1,6 +1,8 @@
 # Raspberry Pi Sensor + Chart display (C#)
 I have created this project as a showcase of what can be done with C#, dot net , an old Raspberry pi and Angular
 This project has several parts separated into each one of the folders as described below.
+There is an additional project that involves Typescript and GraphQL, as well as vue. In order to install this project and toy with it, 
+you need to have Dotnet SDK + Runtime, (V7), Node.js, build essential tools and a Raspberry Pi
 
 ## RPISensor
 This folder contains the C# microservice. This project is meant to be ran in a raspberry pi, with a DHT22 sensor connected to pin 26 (pin number can be set up from appSettings.json). This should also work with a DHT11 Sensor. If your DHT22 comes with 4 pins,  remember to build the schematic  with a 10k ohm resistance between the data pin and VCC. If however it comes with 3 pins and sodered to a small motherboard then the resistance is already in place and you just need to connect it to VCC, GND and whatever pin you want to use. You can google this setup, it is very common.
@@ -47,3 +49,8 @@ The application then runs the command ./rpidht22driver <GPIO pin_number>, the ho
 ## Setting up the C# endpoint
 Move the  appsettings.dist into the SensorDataAPI folder. the navigate into that folder and run dotnet run for development or dotnet publish for production / debug releases
 
+## Setting up the GraphQL Server
+Additionally, this project also has a GraphQL Server using apollo server. Navigate to GraphQLServer and follow the readme instructions there.
+
+## VUE Frontend
+As an additional showcase, there is also a vue folder that feeds from the GraphQL server. Navigate to ./vuecharts and follow the instructions in the README.md file of that folder
