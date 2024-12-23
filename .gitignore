@@ -90,3 +90,6 @@ RPIDHT22Driver/*
 
 # But do not ignore rpidht22driver.c
 !RPIDHT22Driver/rpidht22driver.c
+!RPIDHT22Driver/main.cpp
+!RPIDHT22Driver/dht.cpp
+!RPIDHT22Driver/dht.h
