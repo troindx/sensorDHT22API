@@ -78,7 +78,8 @@ int dht::_readSensor(uint8_t pin, uint8_t wakeupDelay, uint8_t leadingZeroBits) 
     // REQUEST SAMPLE
     pinMode(pin, OUTPUT);
     digitalWrite(pin, LOW); // T-be
-    delay(wakeupDelay);
+    //delay(wakeupDelay);
+    delay(40);
     digitalWrite(pin, HIGH); // T-go
     pinMode(pin, INPUT);
 

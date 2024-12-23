@@ -35,7 +35,8 @@
 // loops using DHTLIB_TIMEOUT use at least 4 clock cycli
 // so 100 us takes max 400 loops
 // so by dividing F_CPU by 40000 we "fail" as fast as possible
-#define DHTLIB_TIMEOUT 400 // (F_CPU/40000)
+//final value adapted for a RPI model 2
+#define DHTLIB_TIMEOUT 22500 // (F_CPU/40000)
 
 class dht
 {
