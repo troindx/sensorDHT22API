@@ -1,10 +1,17 @@
 #include <iostream>
 #include <cstdlib>
 #include "dht.h"
+#include <wiringPi.h>
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         std::cerr << "Usage: " << argv[0] << " <pin_number>" << std::endl;
+        return 1;
+    }
+
+    if (wiringPiSetupGpio() == -1)
+    {
+        printf("WiringPi setup failed!\n");
         return 1;
     }
 
