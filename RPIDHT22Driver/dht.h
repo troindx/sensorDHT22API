@@ -12,12 +12,8 @@
 #ifndef dht_h
 #define dht_h
 
-#if ARDUINO < 100
-#include <WProgram.h>
-#include <pins_arduino.h>  // fix for broken pre 1.0 version - TODO TEST
-#else
-#include <Arduino.h>
-#endif
+#include <wiringPi.h> // For Raspberry Pi GPIO
+#include <stdint.h>
 
 #define DHT_LIB_VERSION "0.1.18"
 
