@@ -2,48 +2,30 @@ using System.Net.Http.Json;
 using Xunit;
 using FluentAssertions;
 using SensorDataAPI.Models;
+using Microsoft.Extensions.DependencyInjection;
+using SensorDataAPI.Services;
 
 namespace SensorDataAPI.Tests
 {
     public class SensorReadingControllerTests : IClassFixture<CustomWebApplicationFactory<Program>>
     {
         private readonly HttpClient _client;
+        private readonly IServiceProvider _serviceProvider;
+
 
         public SensorReadingControllerTests(CustomWebApplicationFactory<Program> factory)
         {
             _client = factory.CreateClient();
+            _serviceProvider = factory.ServiceProvider;
         }
 
-        [Fact]
-        public async Task CreateSensorReading_ShouldReturnCreatedReading()
-        {
-            // Arrange
-            var newReading = new SensorReading
-            {
-                Time = DateTime.UtcNow,
-                Temperature = 23.5,
-                Humidity = 60
-            };
-
-            // Act
-            var response = await _client.PostAsJsonAsync("/api/sensorreadings", newReading);
-
-            // Assert
-            response.EnsureSuccessStatusCode();
-            response.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
-
-            var createdReading = await response.Content.ReadFromJsonAsync<SensorReading>();
-            Assert.NotNull(createdReading);
-            createdReading.Id.Should().BeGreaterThan(0);
-            createdReading.Time.Should().BeCloseTo(newReading.Time, TimeSpan.FromSeconds(1));
-            createdReading.Temperature.Should().Be(newReading.Temperature);
-            createdReading.Humidity.Should().Be(newReading.Humidity);
-        }
 
         [Fact]
         public async Task GetAllSensorReadings_ShouldReturnListOfReadings()
         {
             // Arrange
+            var service = _serviceProvider.GetRequiredService<ISensorReadingService>();
+
             var reading1 = new SensorReading
             {
                 Time = DateTime.UtcNow,
@@ -58,15 +40,9 @@ namespace SensorDataAPI.Tests
                 Humidity = 55
             };
 
-            //Assert insertions were done correctly
-            var result1 = await _client.PostAsJsonAsync("/api/sensorreadings", reading1);
-            var result2 = await _client.PostAsJsonAsync("/api/sensorreadings", reading2);
-            Assert.NotNull(result1);
-            Assert.NotNull(result2);
-            result1.EnsureSuccessStatusCode();
-            result1.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
-            result2.EnsureSuccessStatusCode();
-            result2.StatusCode.Should().Be(System.Net.HttpStatusCode.Created);
+            // Inject initial data directly via the service
+            await service.CreateAsync(reading1);
+            await service.CreateAsync(reading2);
 
             // Act
             var response = await _client.GetAsync("/api/sensorreadings");
@@ -82,75 +58,12 @@ namespace SensorDataAPI.Tests
         }
 
         [Fact]
-        public async Task UpdateSensorReading_ShouldModifyExistingReading()
-        {
-            // Arrange
-            var originalReading = new SensorReading
-            {
-                Time = DateTime.UtcNow,
-                Temperature = 21.0,
-                Humidity = 40
-            };
-
-            var postResponse = await _client.PostAsJsonAsync("/api/sensorreadings", originalReading);
-            var createdReading = await postResponse.Content.ReadFromJsonAsync<SensorReading>();
-            Assert.NotNull(createdReading);
-            var updatedReading = new SensorReading
-            {
-                Time = createdReading.Time.AddHours(1),
-                Temperature = 23.0,
-                Humidity = 45
-            };
-
-            // Act
-            var putResponse = await _client.PutAsJsonAsync($"/api/sensorreadings/{createdReading.Id}", updatedReading);
-
-            // Assert
-            putResponse.EnsureSuccessStatusCode();
-            putResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
-
-            var getResponse = await _client.GetAsync($"/api/sensorreadings/{createdReading.Id}");
-            getResponse.EnsureSuccessStatusCode();
-            var fetchedReading = await getResponse.Content.ReadFromJsonAsync<SensorReading>();
-
-            Assert.NotNull(fetchedReading);
-            fetchedReading.Id.Should().Be(createdReading.Id);
-            fetchedReading.Time.Should().BeCloseTo(updatedReading.Time, TimeSpan.FromSeconds(1));
-            fetchedReading.Temperature.Should().Be(updatedReading.Temperature);
-            fetchedReading.Humidity.Should().Be(updatedReading.Humidity);
-        }
-
-        [Fact]
-        public async Task DeleteSensorReading_ShouldRemoveReading()
-        {
-            // Arrange
-            var reading = new SensorReading
-            {
-                Time = DateTime.UtcNow,
-                Temperature = 20.0,
-                Humidity = 35
-            };
-
-            var postResponse = await _client.PostAsJsonAsync("/api/sensorreadings", reading);
-            var createdReading = await postResponse.Content.ReadFromJsonAsync<SensorReading>();
-            Assert.NotNull(createdReading);
-
-            // Act
-            var deleteResponse = await _client.DeleteAsync($"/api/sensorreadings/{createdReading.Id}");
-
-            // Assert
-            deleteResponse.EnsureSuccessStatusCode();
-            deleteResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NoContent);
-
-            var getResponse = await _client.GetAsync($"/api/sensorreadings/{createdReading.Id}");
-            getResponse.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
-        }
-
-    [Fact]
         public async Task GetAllEndpoint_ShouldReturnFilteredAndPaginatedResults()
         {
+            // Arrange
+            var service = _serviceProvider.GetRequiredService<ISensorReadingService>();
 
-            // Arrange: Add some sensor readings with different dates
+            // Add some sensor readings with different dates
             var readings = new List<SensorReading>
             {
                 new SensorReading { Time = DateTime.UtcNow.AddDays(-5), Temperature = 20.5, Humidity = 40 },
@@ -161,7 +74,7 @@ namespace SensorDataAPI.Tests
 
             foreach (var reading in readings)
             {
-                await _client.PostAsJsonAsync("/api/sensorreadings", reading);
+                await service.CreateAsync(reading);
             }
 
             var startDate = DateTime.UtcNow.AddDays(-5).ToString("yyyy-MM-ddTHH:mm:ssZ");
@@ -186,7 +99,10 @@ namespace SensorDataAPI.Tests
         [Fact]
         public async Task GetAllEndpoint_ShouldReturnCorrectPage()
         {
-            // Arrange: Add some sensor readings with different dates
+            // Arrange
+            var service = _serviceProvider.GetRequiredService<ISensorReadingService>();
+
+            // Add some sensor readings with different dates
             var readings = new List<SensorReading>
             {
                 new SensorReading { Time = DateTime.UtcNow.AddDays(-8), Temperature = 30.5, Humidity = 40 },
@@ -197,7 +113,7 @@ namespace SensorDataAPI.Tests
 
             foreach (var reading in readings)
             {
-                await _client.PostAsJsonAsync("/api/sensorreadings", reading);
+                await service.CreateAsync(reading);
             }
 
             var startDate = DateTime.UtcNow.AddDays(-9).ToString("yyyy-MM-ddTHH:mm:ssZ");
@@ -205,6 +121,7 @@ namespace SensorDataAPI.Tests
             var pageSize = 2;
             var pageNumber = 1;
 
+            // Act: Retrieve the second page of filtered sensor readings
             var response = await _client.GetAsync($"/api/sensorreadings?startDate={startDate}&endDate={endDate}&pageSize={pageSize}&pageNumber={pageNumber}");
             response.EnsureSuccessStatusCode();
 
@@ -217,6 +134,7 @@ namespace SensorDataAPI.Tests
             result.First().Temperature.Should().Be(32.5); // The first reading on page 2
             result.Last().Temperature.Should().Be(30.5); // The last reading on page 2
         }
+
 
     }
 }

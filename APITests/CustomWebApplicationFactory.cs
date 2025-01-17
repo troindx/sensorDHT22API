@@ -9,6 +9,10 @@ namespace SensorDataAPI.Tests
 {
     public class CustomWebApplicationFactory<Program> : WebApplicationFactory<Program> where Program : class
     {
+        private IServiceProvider _serviceProvider;
+
+        public IServiceProvider ServiceProvider => _serviceProvider ?? throw new InvalidOperationException("ServiceProvider has not been initialized.");
+
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureServices(services =>
@@ -29,10 +33,10 @@ namespace SensorDataAPI.Tests
                 });
 
                 // Build the service provider
-                var serviceProvider = services.BuildServiceProvider();
+                 _serviceProvider = services.BuildServiceProvider();
 
                 // Create the database and seed data
-                using (var scope = serviceProvider.CreateScope())
+                using (var scope = _serviceProvider.CreateScope())
                 {
                     var db = scope.ServiceProvider.GetRequiredService<SensorDataContext>();
                     db.Database.EnsureCreated();
