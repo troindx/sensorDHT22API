@@ -37,7 +37,7 @@ namespace Dht22Reader
                 {
                     var reading = new SensorReading
                     {
-                        Time = DateTime.UtcNow,
+                        Time = DateTime.UtcNow.AddHours(1),
                         Temperature = Temperature.DegreesCelsius,
                         Humidity = Humidity.Percent
                     };
