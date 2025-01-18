@@ -1,6 +1,6 @@
 import { RESTDataSource } from "@apollo/datasource-rest";
 
-import { CreateSensorReadingInput, SensorReading } from "../types";
+import { SensorReading } from "../types";
 import dotenv from 'dotenv'
 dotenv.config();
 
@@ -20,20 +20,4 @@ export class ReadingsAPI extends RESTDataSource {
     });
   }
 
-
-  createSensorReading(reading: CreateSensorReadingInput): Promise<SensorReading> {
-    console.log("Creating sensor reading: ", reading);
-    return this.post("sensorreadings", {
-      body: {
-        Temperature: reading.temperature, 
-        Humidity: reading.humidity,
-        Time: reading.time
-      }
-    });
-  }
-
-  deleteSensorReading(id: string): Promise<unknown> {
-    console.log("Deleting sensor reading with id: ", id);
-    return this.delete(`sensorreadings/${id}`);
-  }
 }

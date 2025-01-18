@@ -2,14 +2,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using SensorDataAPI;
 using SensorDataAPI.Data;
 
 namespace SensorDataAPI.Tests
 {
     public class CustomWebApplicationFactory<Program> : WebApplicationFactory<Program> where Program : class
     {
-        private IServiceProvider _serviceProvider;
+        private IServiceProvider? _serviceProvider;
 
         public IServiceProvider ServiceProvider => _serviceProvider ?? throw new InvalidOperationException("ServiceProvider has not been initialized.");
 

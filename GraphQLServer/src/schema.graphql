@@ -10,37 +10,3 @@ type SensorReading {
   time: Date!
 }
 scalar Date
-
-type Mutation {
-  "Creates a new sensorReading"
-  createSensorReading(input: CreateSensorReadingInput!): CreateSensorReadingResponse!
-  deleteSensorReading(id: ID!) : DeleteSensorReadingResponse!
-}
-
-type CreateSensorReadingResponse {
-  "Similar to HTTP status code, represents the status of the mutation"
-  code: Int!
-  "Indicates whether the mutation was successful"
-  success: Boolean!
-  "Human-readable message for the UI"
-  message: String!
-  "The newly created sensor reading"
-  sensorReading: SensorReading
-}
-
-type DeleteSensorReadingResponse {
-  "Similar to HTTP status code, represents the status of the mutation"
-  code: Int!
-  "Indicates whether the mutation was successful"
-  success: Boolean!
-  "Human-readable message for the UI"
-  message: String!
-  "The ID of the Reading that has been deleted"
-  id: ID
-}
-
-input CreateSensorReadingInput {
-  temperature: Float
-  humidity: Float
-  time: Date
-}

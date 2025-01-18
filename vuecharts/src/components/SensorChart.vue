@@ -39,11 +39,6 @@
 
     <LineChart v-if="chartData" :data="chartData" :options="chartOptions" />
     <br/>
-    <v-row>
-      <v-col>
-        <v-btn  @click="navigateToForm">Add Sensor Reading</v-btn>
-      </v-col>
-    </v-row>
   </v-container>
 </template>
 <script>
